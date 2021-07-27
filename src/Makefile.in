@@ -56,7 +56,8 @@ am__objects_1 = main.$(OBJEXT)
 am__objects_2 = os.$(OBJEXT) os_factory.$(OBJEXT) pattern.$(OBJEXT) \
 	queue.$(OBJEXT) sat.$(OBJEXT) sat_factory.$(OBJEXT) \
 	worker.$(OBJEXT) finelock_queue.$(OBJEXT) error_diag.$(OBJEXT) \
-	disk_blocks.$(OBJEXT) adler32memcpy.$(OBJEXT) logger.$(OBJEXT)
+	disk_blocks.$(OBJEXT) adler32memcpy.$(OBJEXT) logger.$(OBJEXT) \
+	third_party/mem_provider.$(OBJEXT) third_party/mmapper.$(OBJEXT)
 am__objects_3 =
 am_stressapptest_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3)
@@ -182,10 +183,10 @@ AM_DEFAULT_SOURCE_EXT = .cc
 MAINFILES = main.cc
 CFILES = os.cc os_factory.cc pattern.cc queue.cc sat.cc sat_factory.cc \
 	worker.cc finelock_queue.cc error_diag.cc disk_blocks.cc \
-	adler32memcpy.cc logger.cc
+	adler32memcpy.cc logger.cc third_party/mem_provider.cc third_party/mmapper.cc
 HFILES = os.h pattern.h queue.h sat.h worker.h sattypes.h \
 	finelock_queue.h error_diag.h disk_blocks.h adler32memcpy.h \
-	logger.h clock.h
+	logger.h clock.h third_party/mem_provider.h third_party/mmapper.h
 stressapptest_SOURCES = $(MAINFILES) $(CFILES) $(HFILES)
 findmask_SOURCES = findmask.c findmask.inc
 all: stressapptest_config.h
@@ -300,6 +301,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/finelock_queue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/third_party/mem_provider.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/third_party/mmapper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/os.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/os_factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pattern.Po@am__quote@

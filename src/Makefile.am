@@ -16,6 +16,8 @@ CFILES += error_diag.cc
 CFILES += disk_blocks.cc
 CFILES += adler32memcpy.cc
 CFILES += logger.cc
+CFILES += third_party/mem_provider.cc
+CFILES += third_party/mmapper.cc
 
 HFILES = os.h
 HFILES += pattern.h
@@ -29,6 +31,8 @@ HFILES += disk_blocks.h
 HFILES += adler32memcpy.h
 HFILES += logger.h
 HFILES += clock.h
+HFILES += third_party/mem_provider.h
+HFILES += third_party/mmapper.h
 
 stressapptest_SOURCES = $(MAINFILES) $(CFILES) $(HFILES)
 findmask_SOURCES = findmask.c findmask.inc

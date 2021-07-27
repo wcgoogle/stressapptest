@@ -126,6 +126,8 @@ AC_CHECK_HEADERS([libaio.h])
 AC_SEARCH_LIBS([io_setup], [aio])
 AC_CHECK_HEADERS([sys/shm.h])
 AC_SEARCH_LIBS([shm_open], [rt])
+AC_CHECK_HEADERS([numa.h])
+AC_SEARCH_LIBS([numa_available], [numa])
 
 
 # Checks for typedefs, structures, and compiler characteristics.

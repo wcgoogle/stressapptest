@@ -30,6 +30,7 @@
 #include "sattypes.h"
 #include "worker.h"
 #include "os.h"
+#include "third_party/mmapper.h"
 
 // SAT stress test class.
 class Sat {
@@ -158,6 +159,8 @@ class Sat {
   uint64 channel_hash_;               // Mask of address bits XORed for channel.
   int channel_width_;                 // Channel width in bits.
   vector< vector<string> > channels_;  // Memory module names per channel.
+  third_party::MMapper mmapper_;        // Additional device memory to test.
+  vector< pair<string, size_t> > devmem_;  // Info on additional device memory.
 
   // Control flags.
   volatile sig_atomic_t user_break_;  // User has signalled early exit.  Used as

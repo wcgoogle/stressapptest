@@ -31,6 +31,7 @@
 #include "adler32memcpy.h"  // NOLINT
 #include "sattypes.h"       // NOLINT
 #include "clock.h"          // NOLINT
+#include "third_party/mmapper.h"  // NOLINT
 
 const char kPagemapPath[] = "/proc/self/pagemap";
 
@@ -68,6 +69,10 @@ class OsLayer {
   // Must be set before Initialize().
   void SetReserveSize(int64 reserve_mb) {
     reserve_mb_ = reserve_mb;
+  }
+
+  void SetMMapper(third_party::MMapper *mmapper) {
+    mmapper_ = mmapper;
   }
 
   // Set parameters needed to translate physical address to memory module.
@@ -387,6 +392,8 @@ class OsLayer {
   vector< vector<string> > *channels_;  // Memory module names per channel.
   uint64 channel_hash_;          // Mask of address bits XORed for channel.
   int channel_width_;            // Channel width in bits.
+  third_party::MMapper *mmapper_;  // Additional device memory to test.
+  std::unique_ptr<third_party::MMappedBlock> mmap_block_;  // Mmapped test memory block.
 
   int64 regionsize_;             // Size of memory "regions"
   int   regioncount_;            // Number of memory "regions"

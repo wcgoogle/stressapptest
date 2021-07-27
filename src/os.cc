@@ -49,6 +49,7 @@
 #include "sattypes.h"
 #include "error_diag.h"
 #include "clock.h"
+#include "third_party/mmapper.h"
 
 // OsLayer initialization.
 OsLayer::OsLayer() {
@@ -641,12 +642,18 @@ bool OsLayer::AllocateTestMem(int64 length, uint64 paddr_base) {
     // If the page size is what SAT is expecting explicitly perform mmap()
     // allocation.
     if (sysconf(_SC_PAGESIZE) >= 4096) {
-      void *map_buf = mmap(NULL, length, PROT_READ | PROT_WRITE,
-                           MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-      if (map_buf != MAP_FAILED) {
-        buf = map_buf;
+      // Device memory request should already be added to mmapper_,
+      // we only need to additionally request main memory here.
+      mmapper_->AddRequest(std::make_unique<third_party::MainMemory>(), length);
+      mmap_block_ = mmapper_->Build();
+
+      if (mmap_block_->data() != nullptr) {
+        buf = mmap_block_->data();
+        // Update length as combined size.
+        length = mmap_block_->length();
         mmapped_allocation_ = true;
         logprintf(0, "Log: Using mmap() allocation at %p.\n", buf);
+        logprintf(0, "Log: Using mmap() length is %lld.\n", length);
       }
     }
     if (!mmapped_allocation_) {

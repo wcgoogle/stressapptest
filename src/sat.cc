@@ -38,6 +38,7 @@
 
 #include <list>
 #include <string>
+#include <sstream>
 
 // This file must work with autoconf on its public version,
 // so these includes are correct.
@@ -591,6 +592,8 @@ bool Sat::Initialize() {
   if (reserve_mb_ > 0)
     os_->SetReserveSize(reserve_mb_);
 
+  os_->SetMMapper(&mmapper_);
+
   if (channels_.size() > 0) {
     logprintf(6, "Log: Decoding memory: %dx%d bit channels,"
         "%d modules per channel (x%d), decoding hash 0x%x\n",
@@ -625,15 +628,22 @@ bool Sat::Initialize() {
   if (!AllocateMemory())
     return false;
 
-  logprintf(5, "Stats: Starting SAT, %dM, %d seconds\n",
+  logprintf(5, "Stats: Starting SAT, %dMB, %d seconds\n",
             static_cast<int>(size_/kMegabyte),
             runtime_seconds_);
+
+  auto combined_size_ = size_;
+  for (const auto& [device_name, device_size] : devmem_) {
+    logprintf(5, "Stats: Testing %ldMB from device %s\n", device_size,
+              device_name.c_str());
+    combined_size_ += device_size * kMegabyte;
+  }
 
   if (!InitializePatterns())
     return false;
 
   // Initialize memory allocation.
-  pages_ = size_ / page_length_;
+  pages_ = combined_size_ / page_length_;
 
   // Allocate page queue depending on queue implementation switch.
   if (pe_q_implementation_ == SAT_FINELOCK) {
@@ -994,6 +1004,34 @@ bool Sat::ParseArgs(int argc, char **argv) {
       continue;
     }
 
+    if (!strcmp(argv[i], "--other_memory")) {
+      i++;
+      if (i < argc) {
+        stringstream ss(argv[i]);
+        string mem;
+        while (getline(ss, mem, ',')) {
+          stringstream mem_ss(mem);
+          string pathname;
+          size_t length_mb = 0 , offset_mb = 0;
+
+          if (!getline(mem_ss, pathname, ':') || mem_ss.eof()) {
+            continue;
+          }
+
+          mem_ss >> length_mb;
+          if (mem_ss.get() == ':')  {
+            mem_ss >> offset_mb;
+          }
+
+          devmem_.push_back(make_pair(pathname, length_mb));
+          mmapper_.AddRequest(
+              std::make_unique<third_party::DeviceMemory>(pathname,
+              offset_mb * kMegabyte), length_mb * kMegabyte);
+        }
+      }
+      continue;
+    }
+
     // Default:
     PrintVersion();
     PrintHelp();
@@ -1164,7 +1202,11 @@ void Sat::PrintHelp() {
          " --channel_width bits     width in bits of each memory channel\n"
          " --memory_channel u1,u2   defines a comma-separated list of names "
          "for dram packages in a memory channel. Use multiple times to "
-         "define multiple channels.\n");
+         "define multiple channels."
+         " --other_memory   Other memory, in addition to main memory "
+         "specified via -M <size_mb>, memory to test in the form: "
+         "'/dev/pmem0:<size_mb>(,/dev/pmem1:<size_mb>:<offset_mb>,...)', "
+         "please note offset_mb is optional, default offset would be 0. \n");
 }
 
 bool Sat::CheckGoogleSpecificArgs(int argc, char **argv, int *i) {
