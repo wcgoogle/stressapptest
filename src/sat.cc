@@ -592,6 +592,7 @@ bool Sat::Initialize() {
   if (reserve_mb_ > 0)
     os_->SetReserveSize(reserve_mb_);
 
+  mmapper_.SetAlignment(2 * kMegabyte);
   os_->SetMMapper(&mmapper_);
 
   if (channels_.size() > 0) {
